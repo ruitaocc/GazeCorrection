@@ -13,7 +13,7 @@
 #include<ctime>
 using namespace std;
 const int linesNum = 76;
-const int TrianglesNum = 41;
+const int TrianglesNum = 43;
 const int MaxWidth = 1024;
 int lastTriangleIndex[MaxWidth];//记录当前的前w个点的triangle index.
 CvMat* all_Invet_Mat[TrianglesNum];
@@ -75,8 +75,8 @@ int lineindex[linesNum][2] = {
 	31,73,
 	73,32,
 	32,70,
-	70,33,
-	33,71,
+	70,33,//
+	33,71,//
 	71,34,
 	34,72,
 	72,31,
@@ -124,20 +124,24 @@ int trianglesindex[TrianglesNum][3] = {
 	74,27,0,
 	74,29,27,
 	74,78,29,
-	78,31,29,
-	78,75,31,
-	75,33,31,
-	75,14,33,
+	78,33,29,
+	78,75,33,
+	75,31,33,
+	75,14,31,
 	75,76,14,
 	0,2,77,
 	0,27,2,
 	27,46,2,
 	27,29,46,
-	29,52,46,
-	29,31,52,
-	31,33,52,
-	33,12,52,
-	33,14,12,
+	29,33,65,
+	29,65,46,
+	33,52,65,
+	65,52,46,
+	//29,52,46,
+	//29,33,52,
+	33,31,52,
+	31,12,52,
+	31,14,12,
 	14,76,12,
 	2,3,77,
 	2,46,3,
@@ -251,12 +255,12 @@ void GaztCorrection::paintLands(){
 	painter.setPen(pen);
 	for (int i = 0; i < modified_land.size(); i++){
 		painter.drawPoint(modified_land[i]);
-	}
-	*/
+	}*/
+	
 }; 
 /*
 void GaztCorrection::paintEvent(QPaintEvent *){
-	//this->paintLands();
+	this->paintLands();
 };*/
 bool isInTriangle(QPoint *a, QPoint*b, QPoint *c, QPoint p,float *landas){
 	
@@ -274,47 +278,49 @@ bool isInTriangle(QPoint *a, QPoint*b, QPoint *c, QPoint p,float *landas){
 	if (y1 < 0 || y2 < 0 || y3 < 0){
 		return 0;
 	}
-	CvMat* matA = cvCreateMat(3, 3, CV_32FC1);//创建矩阵
-	CvMat* matAP = cvCreateMat(3, 3, CV_32FC1);//创建矩阵
-	CV_MAT_ELEM(*matA, float, 0, 0) = a->x();
-	CV_MAT_ELEM(*matA, float, 0, 1) = b->x();
-	CV_MAT_ELEM(*matA, float, 0, 2) = c->x();
-	CV_MAT_ELEM(*matA, float, 1, 0) = a->y();
-	CV_MAT_ELEM(*matA, float, 1, 1) = b->y();
-	CV_MAT_ELEM(*matA, float, 1, 2) = c->y();
-	CV_MAT_ELEM(*matA, float, 2, 0) = 1.f;
-	CV_MAT_ELEM(*matA, float, 2, 1) = 1.f;
-	CV_MAT_ELEM(*matA, float, 2, 2) = 1.f;
-	CvMat* matY = cvCreateMat(3, 1, CV_32FC1);//创建矩阵
-	CV_MAT_ELEM(*matY, float, 0, 0) = p.x();
-	CV_MAT_ELEM(*matY, float, 1, 0) = p.y();
-	CV_MAT_ELEM(*matY, float, 2, 0) = 1.f;
-	CvMat* matX = cvCreateMat(3, 1, CV_32FC1);//创建矩阵
-	cvInvert(matA, matAP, CV_LU);
-	cvMatMul(matAP, matY, matX);
-	landas[0] = CV_MAT_ELEM(*matX, float, 0, 0);
-	landas[1] = CV_MAT_ELEM(*matX, float, 1, 0);
-	landas[2] = CV_MAT_ELEM(*matX, float, 2, 0);
-	return 1;
-	/*
-	CvMat* matAP = all_Invet_Mat[g_triangeIndex];//创建矩阵
-	CvMat* matY = cvCreateMat(3, 1, CV_32FC1);//创建矩阵
-	CV_MAT_ELEM(*matY, float, 0, 0) = p.x();
-	CV_MAT_ELEM(*matY, float, 1, 0) = p.y();
-	CV_MAT_ELEM(*matY, float, 2, 0) = 1.f;
-	CvMat* matX = cvCreateMat(3, 1, CV_32FC1);//创建矩阵
-	cvMatMul(matAP, matY, matX);
-	landas[0] = CV_MAT_ELEM(*matX, float, 0, 0);
-	landas[1] = CV_MAT_ELEM(*matX, float, 1, 0);
-	landas[2] = CV_MAT_ELEM(*matX, float, 2, 0);
-	return 1;
-	*/
+	if (1){
+		CvMat* matA = cvCreateMat(3, 3, CV_32FC1);//创建矩阵
+		CvMat* matAP = cvCreateMat(3, 3, CV_32FC1);//创建矩阵
+		CV_MAT_ELEM(*matA, float, 0, 0) = a->x();
+		CV_MAT_ELEM(*matA, float, 0, 1) = b->x();
+		CV_MAT_ELEM(*matA, float, 0, 2) = c->x();
+		CV_MAT_ELEM(*matA, float, 1, 0) = a->y();
+		CV_MAT_ELEM(*matA, float, 1, 1) = b->y();
+		CV_MAT_ELEM(*matA, float, 1, 2) = c->y();
+		CV_MAT_ELEM(*matA, float, 2, 0) = 1.f;
+		CV_MAT_ELEM(*matA, float, 2, 1) = 1.f;
+		CV_MAT_ELEM(*matA, float, 2, 2) = 1.f;
+		CvMat* matY = cvCreateMat(3, 1, CV_32FC1);//创建矩阵
+		CV_MAT_ELEM(*matY, float, 0, 0) = p.x();
+		CV_MAT_ELEM(*matY, float, 1, 0) = p.y();
+		CV_MAT_ELEM(*matY, float, 2, 0) = 1.f;
+		CvMat* matX = cvCreateMat(3, 1, CV_32FC1);//创建矩阵
+		cvInvert(matA, matAP, CV_LU);
+		cvMatMul(matAP, matY, matX);
+		landas[0] = CV_MAT_ELEM(*matX, float, 0, 0);
+		landas[1] = CV_MAT_ELEM(*matX, float, 1, 0);
+		landas[2] = CV_MAT_ELEM(*matX, float, 2, 0);
+		return 1;
+	}
+	else{
+	
+		CvMat* matAP = all_Invet_Mat[g_triangeIndex];//创建矩阵
+		CvMat* matY = cvCreateMat(3, 1, CV_32FC1);//创建矩阵
+		CV_MAT_ELEM(*matY, float, 0, 0) = p.x();
+		CV_MAT_ELEM(*matY, float, 1, 0) = p.y();
+		CV_MAT_ELEM(*matY, float, 2, 0) = 1.f;
+		CvMat* matX = cvCreateMat(3, 1, CV_32FC1);//创建矩阵
+		cvMatMul(matAP, matY, matX);
+		landas[0] = CV_MAT_ELEM(*matX, float, 0, 0);
+		landas[1] = CV_MAT_ELEM(*matX, float, 1, 0);
+		landas[2] = CV_MAT_ELEM(*matX, float, 2, 0);
+		return 1;
+	}
 };
 void FaceWarp(vector<QPoint> &original_land, vector<QPoint> &modified_land, IplImage *result){
 	clock_t start, finish;
 	start = clock();
 	IplImage *tmpimage = cvCloneImage(result);
-	cvZero(result);
 	//tmpimage = cvCloneImage (result);
 	//return;
 	int width = tmpimage->width;
@@ -324,7 +330,9 @@ void FaceWarp(vector<QPoint> &original_land, vector<QPoint> &modified_land, IplI
 	float landas[3] = {0};
 	g_triangeIndex = 0;
 	CvScalar value;
-	int map_x = 0, map_y = 0;
+	float map_x = 0, map_y = 0;
+	CvScalar value00, value01, value10, value11;
+	float aa, bb;
 	for (int i = 0; i < MaxWidth; i++)lastTriangleIndex[i] = -1;
 	for (int i = 0; i < TrianglesNum; i++){
 		//计算 矩阵的逆
@@ -348,8 +356,6 @@ void FaceWarp(vector<QPoint> &original_land, vector<QPoint> &modified_land, IplI
 	for (int h = 0; h < height; h++){
 		for (int w = 0; w < width; w++){
 			if (w < 132 || w >= 252 || h < 34 || h >= 200){
-				value = cvGet2D(tmpimage, h, w);
-				cvSet2D(result, h, w, value);
 				continue;
 			}
 			sum++;
@@ -402,8 +408,18 @@ void FaceWarp(vector<QPoint> &original_land, vector<QPoint> &modified_land, IplI
 				if (map_y >= height)map_y = height - 1;
 				if (map_x <= 0)map_x = 0;
 				if (map_y <= 0)map_y = 0;
-				value = cvGet2D(tmpimage, map_y, map_x);
-				cvSet2D(result, h, w, value);
+				//分界优化
+				//value = cvGet2D(tmpimage, (int)map_y, (int)map_x);
+				aa = map_x - ((int)map_x);
+				bb = map_y - ((int)map_y);
+				value00 = cvGet2D(tmpimage, (int)map_y, (int)map_x);
+				value01 = cvGet2D(tmpimage, (int)(map_y+1), (int)map_x); 
+				value10 = cvGet2D(tmpimage, (int)map_y, (int)(map_x+1));
+				value11 = cvGet2D(tmpimage, (int)(map_y + 1), (int)(map_x + 1));
+				for (int ii = 0; ii < 3; ii++){
+					value.val[ii] = (1 - aa)*(1 - bb)*value00.val[ii] + aa*(1 - bb)*value10.val[ii] + aa*bb*value11.val[ii] + (1-aa)*bb*value01.val[ii];
+				}
+				cvSet2D(result, h, w, value); 
 			}
 		}
 	}
