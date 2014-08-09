@@ -7,38 +7,167 @@
     <x>0</x>
     <y>0</y>
     <width>932</width>
-    <height>643</height>
+    <height>904</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>GaztCorrection</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QLabel" name="m_Image">
+   <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>0</y>
-      <width>461</width>
-      <height>361</height>
+      <x>0</x>
+      <y>390</y>
+      <width>661</width>
+      <height>461</height>
      </rect>
     </property>
-    <property name="text">
-     <string>TextLabel</string>
+    <property name="currentIndex">
+     <number>1</number>
     </property>
+    <widget class="QWidget" name="in">
+     <attribute name="title">
+      <string>in</string>
+     </attribute>
+     <widget class="QLabel" name="m_Image">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>461</width>
+        <height>361</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>TextLabel</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab_3">
+     <attribute name="title">
+      <string>target_out</string>
+     </attribute>
+     <widget class="QLabel" name="m_target_out_image">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>461</width>
+        <height>361</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>TextLabel</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="out">
+     <attribute name="title">
+      <string>out</string>
+     </attribute>
+     <widget class="QLabel" name="m_output_image">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>461</width>
+        <height>361</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>TextLabel</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab">
+     <attribute name="title">
+      <string>transfer</string>
+     </attribute>
+     <widget class="QLabel" name="m_transfer_iamge">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>461</width>
+        <height>361</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>TextLabel</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab_2">
+     <attribute name="title">
+      <string>seamless</string>
+     </attribute>
+     <widget class="QLabel" name="m_seamless_image">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>461</width>
+        <height>361</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>TextLabel</string>
+      </property>
+     </widget>
+    </widget>
    </widget>
-   <widget class="QLabel" name="m_output_image">
+   <widget class="QGroupBox" name="m_groupBox">
     <property name="geometry">
      <rect>
-      <x>420</x>
+      <x>0</x>
       <y>0</y>
-      <width>511</width>
-      <height>361</height>
+      <width>641</width>
+      <height>341</height>
      </rect>
     </property>
-    <property name="text">
-     <string>TextLabel</string>
+    <property name="title">
+     <string>vedio</string>
     </property>
+    <widget class="QPushButton" name="m_reset_btn">
+     <property name="geometry">
+      <rect>
+       <x>180</x>
+       <y>310</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Reset</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>310</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Play</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="m_stop_btn">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>310</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Stop</string>
+     </property>
+    </widget>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -65,5 +194,59 @@
  <resources>
   <include location="gaztcorrection.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>GaztCorrectionClass</receiver>
+   <slot>playVideo()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>601</x>
+     <y>77</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>830</x>
+     <y>95</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>m_stop_btn</sender>
+   <signal>clicked()</signal>
+   <receiver>GaztCorrectionClass</receiver>
+   <slot>stopVideo()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>591</x>
+     <y>104</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>793</x>
+     <y>128</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>m_reset_btn</sender>
+   <signal>clicked()</signal>
+   <receiver>GaztCorrectionClass</receiver>
+   <slot>terminateVideo()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>596</x>
+     <y>149</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>787</x>
+     <y>191</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>playVideo()</slot>
+  <slot>stopVideo()</slot>
+  <slot>terminateVideo()</slot>
+ </slots>
 </ui>

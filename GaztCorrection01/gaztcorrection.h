@@ -5,6 +5,8 @@
 #include "ui_gaztcorrection.h"
 #include <vector>
 #include <QPoint>
+#include "videoWidget.h"
+#include "GazeCorrector.h"
 using namespace std;
 typedef struct myLine{
 	QPoint startPnt;
@@ -17,12 +19,17 @@ class GaztCorrection : public QMainWindow
 public:
 	GaztCorrection(QWidget *parent = 0);
 	~GaztCorrection();
-	//void paintEvent(QPaintEvent *);
+	
+public slots:
+	void playVideo();
+	void stopVideo();
+	void terminateVideo();
 private:
+	GazeCorrector coreector;
+
 	Ui::GaztCorrectionClass ui;
 	void paintLands();
-	vector<myLine> orignal_lines;   
-	vector<myLine> modified_lines;
+	VideoWidget *mw;
 };
 
 #endif // GAZTCORRECTION_H
