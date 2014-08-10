@@ -19,6 +19,7 @@
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QPushButton>
+#include <QtWidgets/QRadioButton>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTabWidget>
 #include <QtWidgets/QToolBar>
@@ -42,9 +43,14 @@ public:
     QWidget *tab_2;
     QLabel *m_seamless_image;
     QGroupBox *m_groupBox;
+    QGroupBox *m_out_groupBox;
+    QGroupBox *groupBox_2;
     QPushButton *m_reset_btn;
-    QPushButton *pushButton;
     QPushButton *m_stop_btn;
+    QPushButton *m_play_btn;
+    QRadioButton *m_radioBtn_Realtime;
+    QRadioButton *m_radioBtn_offline;
+    QPushButton *m_file_btn;
     QMenuBar *menuBar;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
@@ -91,16 +97,31 @@ public:
         tabWidget->addTab(tab_2, QString());
         m_groupBox = new QGroupBox(centralWidget);
         m_groupBox->setObjectName(QStringLiteral("m_groupBox"));
-        m_groupBox->setGeometry(QRect(0, 0, 641, 341));
-        m_reset_btn = new QPushButton(m_groupBox);
+        m_groupBox->setGeometry(QRect(0, 0, 331, 261));
+        m_out_groupBox = new QGroupBox(centralWidget);
+        m_out_groupBox->setObjectName(QStringLiteral("m_out_groupBox"));
+        m_out_groupBox->setGeometry(QRect(330, 0, 331, 261));
+        groupBox_2 = new QGroupBox(centralWidget);
+        groupBox_2->setObjectName(QStringLiteral("groupBox_2"));
+        groupBox_2->setGeometry(QRect(0, 270, 661, 80));
+        m_reset_btn = new QPushButton(groupBox_2);
         m_reset_btn->setObjectName(QStringLiteral("m_reset_btn"));
-        m_reset_btn->setGeometry(QRect(180, 310, 75, 23));
-        pushButton = new QPushButton(m_groupBox);
-        pushButton->setObjectName(QStringLiteral("pushButton"));
-        pushButton->setGeometry(QRect(20, 310, 75, 23));
-        m_stop_btn = new QPushButton(m_groupBox);
+        m_reset_btn->setGeometry(QRect(290, 40, 75, 23));
+        m_stop_btn = new QPushButton(groupBox_2);
         m_stop_btn->setObjectName(QStringLiteral("m_stop_btn"));
-        m_stop_btn->setGeometry(QRect(100, 310, 75, 23));
+        m_stop_btn->setGeometry(QRect(210, 40, 75, 23));
+        m_play_btn = new QPushButton(groupBox_2);
+        m_play_btn->setObjectName(QStringLiteral("m_play_btn"));
+        m_play_btn->setGeometry(QRect(130, 40, 75, 23));
+        m_radioBtn_Realtime = new QRadioButton(groupBox_2);
+        m_radioBtn_Realtime->setObjectName(QStringLiteral("m_radioBtn_Realtime"));
+        m_radioBtn_Realtime->setGeometry(QRect(10, 20, 89, 16));
+        m_radioBtn_offline = new QRadioButton(groupBox_2);
+        m_radioBtn_offline->setObjectName(QStringLiteral("m_radioBtn_offline"));
+        m_radioBtn_offline->setGeometry(QRect(10, 40, 89, 16));
+        m_file_btn = new QPushButton(groupBox_2);
+        m_file_btn->setObjectName(QStringLiteral("m_file_btn"));
+        m_file_btn->setGeometry(QRect(400, 40, 75, 23));
         GaztCorrectionClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(GaztCorrectionClass);
         menuBar->setObjectName(QStringLiteral("menuBar"));
@@ -114,9 +135,12 @@ public:
         GaztCorrectionClass->setStatusBar(statusBar);
 
         retranslateUi(GaztCorrectionClass);
-        QObject::connect(pushButton, SIGNAL(clicked()), GaztCorrectionClass, SLOT(playVideo()));
+        QObject::connect(m_play_btn, SIGNAL(clicked()), GaztCorrectionClass, SLOT(playVideo()));
         QObject::connect(m_stop_btn, SIGNAL(clicked()), GaztCorrectionClass, SLOT(stopVideo()));
         QObject::connect(m_reset_btn, SIGNAL(clicked()), GaztCorrectionClass, SLOT(terminateVideo()));
+        QObject::connect(m_file_btn, SIGNAL(clicked()), GaztCorrectionClass, SLOT(file()));
+        QObject::connect(m_radioBtn_Realtime, SIGNAL(clicked()), GaztCorrectionClass, SLOT(processMode()));
+        QObject::connect(m_radioBtn_offline, SIGNAL(clicked()), GaztCorrectionClass, SLOT(processMode()));
 
         tabWidget->setCurrentIndex(1);
 
@@ -137,10 +161,15 @@ public:
         tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("GaztCorrectionClass", "transfer", 0));
         m_seamless_image->setText(QApplication::translate("GaztCorrectionClass", "TextLabel", 0));
         tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("GaztCorrectionClass", "seamless", 0));
-        m_groupBox->setTitle(QApplication::translate("GaztCorrectionClass", "vedio", 0));
+        m_groupBox->setTitle(QApplication::translate("GaztCorrectionClass", "video input", 0));
+        m_out_groupBox->setTitle(QApplication::translate("GaztCorrectionClass", "video output", 0));
+        groupBox_2->setTitle(QApplication::translate("GaztCorrectionClass", "Controler", 0));
         m_reset_btn->setText(QApplication::translate("GaztCorrectionClass", "Reset", 0));
-        pushButton->setText(QApplication::translate("GaztCorrectionClass", "Play", 0));
         m_stop_btn->setText(QApplication::translate("GaztCorrectionClass", "Stop", 0));
+        m_play_btn->setText(QApplication::translate("GaztCorrectionClass", "Play", 0));
+        m_radioBtn_Realtime->setText(QApplication::translate("GaztCorrectionClass", "RealTime", 0));
+        m_radioBtn_offline->setText(QApplication::translate("GaztCorrectionClass", "Off Line", 0));
+        m_file_btn->setText(QApplication::translate("GaztCorrectionClass", "File", 0));
     } // retranslateUi
 
 };

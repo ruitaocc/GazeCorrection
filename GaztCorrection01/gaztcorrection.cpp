@@ -3,6 +3,7 @@
 #include <QMessageBox>  
 #include <QPainter>  
 #include <QPen>  
+#include <qfiledialog.h>
 #include <QMouseEvent>
 #include <qimage.h>
 #include <string>
@@ -17,7 +18,7 @@ using namespace std;
 
 const int linesNum = 76;
 string imagepath("C:/Users/VectorCai/Desktop/gazetest/02.png");
-string vediopath("C:/Users/VectorCai/Desktop/gazetest/test.avi");
+string default_vediopath("C:/Users/VectorCai/Desktop/gazetest/test.avi");
 string target_out_imagepath("C:/Users/VectorCai/Desktop/gazetest/03.png");
 
 //in different platform need to change this function to specific platform.
@@ -125,35 +126,71 @@ GaztCorrection::GaztCorrection(QWidget *parent)
 	: QMainWindow(parent)
 {
 	ui.setupUi(this);
+
+	m_video_filepath = default_vediopath;
+	m_mode = P_OFFLINE_MODE;
+	loop = false;
+	this->ui.m_radioBtn_offline->setChecked(1);
+
 	QImage imagein(imagepath.c_str());
 	QImage image_target_out(target_out_imagepath.c_str());
+	IplImage *t_test = cvLoadImage(imagepath.c_str());
 	this->resize(1200, 800);
-	this->paintLands();
 	this->ui.m_Image->setPixmap(QPixmap::fromImage(imagein));
 	this->ui.m_target_out_image->setPixmap(QPixmap::fromImage(image_target_out));
-	//add player
-	QGridLayout * mainLayout = new QGridLayout();
-	mw = new VideoWidget(vediopath.c_str());
-	mw->setFixedWidth(320);
-	mw->setFixedHeight(240);
-	mainLayout->addWidget(mw, 0, 0, Qt::AlignLeft | Qt::AlignTop);
-	this->ui.m_groupBox->setLayout(mainLayout);
-	mw->show();
 	
+	//
+	m_gaze_conthroller = new GazeController();
+	connect(m_gaze_conthroller, SIGNAL(sendImg(IplImage*)), this, SLOT(setNextFrameToOutput(IplImage*)));
+	connect(this, SIGNAL(sendData(vector<CvPoint>, vector<CvPoint>)), m_gaze_conthroller, SLOT(setData(vector<CvPoint>, vector<CvPoint>)));
+	//
+	this->paintLands();
+	//add player
+	QGridLayout * in_group_Layout = new QGridLayout();
+	m_video_input_widget = new VideoWidget(m_video_filepath.c_str());
+	m_video_input_widget->setFixedHeight(240);
+	m_video_input_widget->setFixedWidth(320);
+	in_group_Layout->addWidget(m_video_input_widget, 0, 0, Qt::AlignLeft | Qt::AlignTop);
+	this->ui.m_groupBox->setLayout(in_group_Layout);
+	m_video_input_widget->show();
+	connect(m_video_input_widget, SIGNAL(sendTerminateSignal()), this, SLOT(receiveTerminateSignal()));
+
+	QGridLayout * out_group_Layout = new QGridLayout();
+	m_video_output_widget = new VideoWidget();
+	m_video_output_widget->setFixedWidth(320);
+	m_video_output_widget->setFixedHeight(240);
+	m_video_output_widget->setNextFrame(m_video_input_widget->getCurrentFrameClone());
+	out_group_Layout->addWidget(m_video_output_widget, 0, 0, Qt::AlignLeft | Qt::AlignTop);
+	this->ui.m_out_groupBox->setLayout(out_group_Layout);
+	m_video_output_widget->show();
+	m_gaze_conthroller->setInputAndOutput(m_video_input_widget, m_video_output_widget);
 }
 
 GaztCorrection::~GaztCorrection()
 {
-
+	delete m_video_input_widget;
+	delete m_video_output_widget;
 }
+
+void GaztCorrection::setNextFrameToOutput(IplImage *img){
+	m_video_output_widget->setNextFrame(img);
+	if (loop)m_gaze_conthroller->start();
+};
 void GaztCorrection::playVideo(){
-	mw->play();
+	m_video_input_widget->play();
+	loop = true;
+	m_gaze_conthroller->start();
 };
 void GaztCorrection::stopVideo(){
-	mw->stop();
+	m_video_input_widget->stop();
+	loop = false;
 };
 void GaztCorrection::terminateVideo(){
-	mw->reset();
+	m_video_input_widget->reset();
+	loop = false;
+};
+void GaztCorrection::receiveTerminateSignal(){
+	loop = false;
 };
 vector<CvPoint> original_land;
 vector<CvPoint> modified_land;
@@ -184,17 +221,47 @@ void GaztCorrection::paintLands(){
 		modified_land.push_back(cvPoint(first*s_width + 0.5, (1.0 - second)*s_height + 0.5));
 	}
 	file.close();
+	//m_gaze_conthroller->setData(original_land, modified_land);
+	emit sendData(original_land, modified_land);
 	IplImage *inputImage = cvLoadImage(imagepath.c_str());
-	coreector.FaceWarp(original_land, modified_land, inputImage);
-	this->ui.m_transfer_iamge->setPixmap(QPixmap::fromImage(*IplImageToQImage(coreector.transfer_image)));
-	this->ui.m_output_image->setPixmap(QPixmap::fromImage(*IplImageToQImage(coreector.mid01_image)));
-	this->ui.m_seamless_image->setPixmap(QPixmap::fromImage(*IplImageToQImage(coreector.sealess_image)));
-
-	
-	
-	
-	
+	GazeCorrector *gazecorrector = new GazeCorrector();
+	gazecorrector->FaceWarp(original_land, modified_land, inputImage);
+	this->ui.m_transfer_iamge->setPixmap(QPixmap::fromImage(*IplImageToQImage(gazecorrector->transfer_image)));
+	this->ui.m_output_image->setPixmap(QPixmap::fromImage(*IplImageToQImage(gazecorrector->mid01_image)));
+	this->ui.m_seamless_image->setPixmap(QPixmap::fromImage(*IplImageToQImage(gazecorrector->sealess_image)));
 }; 
+
+void GaztCorrection::file(){
+	this->stopVideo();
+	QString qstr_path = QFileDialog::getOpenFileName(this, "Select file", "", "allfiles(*.*)");
+	if (!qstr_path.isEmpty()){
+		m_video_filepath = qstr_path.toStdString();
+		this->m_video_input_widget->setFilePath(m_video_filepath);
+	}
+};
+void GaztCorrection::processMode(){
+	if (this->ui.m_radioBtn_Realtime->isChecked()){
+		m_mode = P_REALTIME_MODE;
+		this->hideControlBtns();
+	}
+	else {
+		m_mode = P_OFFLINE_MODE;
+		this->showControlBtns();
+	}
+};
+void GaztCorrection::hideControlBtns(){
+	this->ui.m_file_btn->hide();
+	this->ui.m_reset_btn->hide();
+	this->ui.m_stop_btn->hide();
+	this->ui.m_play_btn->hide();
+};
+void GaztCorrection::showControlBtns(){
+	this->ui.m_file_btn->show();
+	this->ui.m_reset_btn->show();
+	this->ui.m_stop_btn->show();
+	this->ui.m_play_btn->show();
+};
+
 /*
 void GaztCorrection::pait(){
 	//paint lands

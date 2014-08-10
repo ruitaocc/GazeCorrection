@@ -122,18 +122,44 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>641</width>
-      <height>341</height>
+      <width>331</width>
+      <height>261</height>
      </rect>
     </property>
     <property name="title">
-     <string>vedio</string>
+     <string>video input</string>
+    </property>
+   </widget>
+   <widget class="QGroupBox" name="m_out_groupBox">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>0</y>
+      <width>331</width>
+      <height>261</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>video output</string>
+    </property>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_2">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>270</y>
+      <width>661</width>
+      <height>80</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Controler</string>
     </property>
     <widget class="QPushButton" name="m_reset_btn">
      <property name="geometry">
       <rect>
-       <x>180</x>
-       <y>310</y>
+       <x>290</x>
+       <y>40</y>
        <width>75</width>
        <height>23</height>
       </rect>
@@ -142,11 +168,24 @@
       <string>Reset</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButton">
+    <widget class="QPushButton" name="m_stop_btn">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>310</y>
+       <x>210</x>
+       <y>40</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Stop</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="m_play_btn">
+     <property name="geometry">
+      <rect>
+       <x>130</x>
+       <y>40</y>
        <width>75</width>
        <height>23</height>
       </rect>
@@ -155,17 +194,43 @@
       <string>Play</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="m_stop_btn">
+    <widget class="QRadioButton" name="m_radioBtn_Realtime">
      <property name="geometry">
       <rect>
-       <x>100</x>
-       <y>310</y>
+       <x>10</x>
+       <y>20</y>
+       <width>89</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>RealTime</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="m_radioBtn_offline">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>40</y>
+       <width>89</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Off Line</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="m_file_btn">
+     <property name="geometry">
+      <rect>
+       <x>400</x>
+       <y>40</y>
        <width>75</width>
        <height>23</height>
       </rect>
      </property>
      <property name="text">
-      <string>Stop</string>
+      <string>File</string>
      </property>
     </widget>
    </widget>
@@ -196,14 +261,14 @@
  </resources>
  <connections>
   <connection>
-   <sender>pushButton</sender>
+   <sender>m_play_btn</sender>
    <signal>clicked()</signal>
    <receiver>GaztCorrectionClass</receiver>
    <slot>playVideo()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>601</x>
-     <y>77</y>
+     <x>204</x>
+     <y>345</y>
     </hint>
     <hint type="destinationlabel">
      <x>830</x>
@@ -218,8 +283,8 @@
    <slot>stopVideo()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>591</x>
-     <y>104</y>
+     <x>284</x>
+     <y>345</y>
     </hint>
     <hint type="destinationlabel">
      <x>793</x>
@@ -234,12 +299,60 @@
    <slot>terminateVideo()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>596</x>
-     <y>149</y>
+     <x>364</x>
+     <y>345</y>
     </hint>
     <hint type="destinationlabel">
      <x>787</x>
      <y>191</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>m_file_btn</sender>
+   <signal>clicked()</signal>
+   <receiver>GaztCorrectionClass</receiver>
+   <slot>file()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>439</x>
+     <y>357</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>806</x>
+     <y>316</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>m_radioBtn_Realtime</sender>
+   <signal>clicked()</signal>
+   <receiver>GaztCorrectionClass</receiver>
+   <slot>processMode()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>56</x>
+     <y>336</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>792</x>
+     <y>402</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>m_radioBtn_offline</sender>
+   <signal>clicked()</signal>
+   <receiver>GaztCorrectionClass</receiver>
+   <slot>processMode()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>32</x>
+     <y>356</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>754</x>
+     <y>416</y>
     </hint>
    </hints>
   </connection>
@@ -248,5 +361,7 @@
   <slot>playVideo()</slot>
   <slot>stopVideo()</slot>
   <slot>terminateVideo()</slot>
+  <slot>file()</slot>
+  <slot>processMode()</slot>
  </slots>
 </ui>

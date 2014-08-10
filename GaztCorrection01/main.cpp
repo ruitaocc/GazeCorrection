@@ -9,5 +9,5 @@ int main(int argc, char *argv[])
 	GaztCorrection w;
 	w.show();
 	return a.exec();
-	}
+}
 #endif
