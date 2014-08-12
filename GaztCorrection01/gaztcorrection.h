@@ -6,6 +6,7 @@
 #include <vector>
 #include <QPoint>
 #include "videoWidget.h"
+#include "webcam_widget.h"
 #include "GazeController.h"
 #include <string>
 using namespace std;
@@ -41,8 +42,9 @@ private:
 signals:
 	void sendData(vector<CvPoint> a, vector<CvPoint> b);
 private:
-	VideoWidget *m_video_input_widget;
+	VideoWidget *m_video_local_input_widget;
 	VideoWidget *m_video_output_widget;
+	WebCam_Widget * m_video_webcam_input_widget;
 	string m_video_filepath;
 	ProcessMode m_mode;
 

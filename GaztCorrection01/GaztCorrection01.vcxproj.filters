@@ -92,6 +92,15 @@
     <ClCompile Include="GeneratedFiles\Release\moc_GazeController.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="webcam_widget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_webcam_widget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_webcam_widget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="gaztcorrection.h">
@@ -107,6 +116,9 @@
       <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="GazeController.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="webcam_widget.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>

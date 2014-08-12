@@ -147,28 +147,30 @@ GaztCorrection::GaztCorrection(QWidget *parent)
 	this->paintLands();
 	//add player
 	QGridLayout * in_group_Layout = new QGridLayout();
-	m_video_input_widget = new VideoWidget(m_video_filepath.c_str());
-	m_video_input_widget->setFixedHeight(240);
-	m_video_input_widget->setFixedWidth(320);
-	in_group_Layout->addWidget(m_video_input_widget, 0, 0, Qt::AlignLeft | Qt::AlignTop);
+	m_video_local_input_widget = new VideoWidget(m_video_filepath.c_str());
+	m_video_local_input_widget->setFixedHeight(240);
+	m_video_local_input_widget->setFixedWidth(320);
+	in_group_Layout->addWidget(m_video_local_input_widget, 0, 0, Qt::AlignLeft | Qt::AlignTop);
 	this->ui.m_groupBox->setLayout(in_group_Layout);
-	m_video_input_widget->show();
-	connect(m_video_input_widget, SIGNAL(sendTerminateSignal()), this, SLOT(receiveTerminateSignal()));
+	m_video_local_input_widget->show();
+	connect(m_video_local_input_widget, SIGNAL(sendTerminateSignal()), this, SLOT(receiveTerminateSignal()));
 
 	QGridLayout * out_group_Layout = new QGridLayout();
 	m_video_output_widget = new VideoWidget();
 	m_video_output_widget->setFixedWidth(320);
 	m_video_output_widget->setFixedHeight(240);
-	m_video_output_widget->setNextFrame(m_video_input_widget->getCurrentFrameClone());
+	m_video_output_widget->setNextFrame(m_video_local_input_widget->getCurrentFrameClone());
 	out_group_Layout->addWidget(m_video_output_widget, 0, 0, Qt::AlignLeft | Qt::AlignTop);
 	this->ui.m_out_groupBox->setLayout(out_group_Layout);
 	m_video_output_widget->show();
-	m_gaze_conthroller->setInputAndOutput(m_video_input_widget, m_video_output_widget);
+	m_gaze_conthroller->setInputAndOutput(m_video_local_input_widget, m_video_output_widget);
+
+	m_video_webcam_input_widget = new WebCam_Widget();
 }
 
 GaztCorrection::~GaztCorrection()
 {
-	delete m_video_input_widget;
+	delete m_video_local_input_widget;
 	delete m_video_output_widget;
 }
 
@@ -177,16 +179,16 @@ void GaztCorrection::setNextFrameToOutput(IplImage *img){
 	if (loop)m_gaze_conthroller->start();
 };
 void GaztCorrection::playVideo(){
-	m_video_input_widget->play();
+	m_video_local_input_widget->play();
 	loop = true;
 	m_gaze_conthroller->start();
 };
 void GaztCorrection::stopVideo(){
-	m_video_input_widget->stop();
+	m_video_local_input_widget->stop();
 	loop = false;
 };
 void GaztCorrection::terminateVideo(){
-	m_video_input_widget->reset();
+	m_video_local_input_widget->reset();
 	loop = false;
 };
 void GaztCorrection::receiveTerminateSignal(){
@@ -236,7 +238,7 @@ void GaztCorrection::file(){
 	QString qstr_path = QFileDialog::getOpenFileName(this, "Select file", "", "allfiles(*.*)");
 	if (!qstr_path.isEmpty()){
 		m_video_filepath = qstr_path.toStdString();
-		this->m_video_input_widget->setFilePath(m_video_filepath);
+		this->m_video_local_input_widget->setFilePath(m_video_filepath);
 	}
 };
 void GaztCorrection::processMode(){
