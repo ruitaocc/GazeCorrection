@@ -2,34 +2,51 @@
 #include <QtGui\QPainter> 
 #include <QtCore\QPoint> 
 
-WebCam_Widget::WebCam_Widget(QWidget *parent /* = 0 */) : QWidget(parent){
+WebCam_Widget::WebCam_Widget(CvSize size) {
+	this->initdata();
+	m_size = size;
 	this->initStatus();
-	status = W_STATUS_PLAYING;
+	this->setFixedHeight(size.height);
+	this->setFixedWidth(size.width);
+	this->resize(m_size.width,m_size.height);
+};
+void WebCam_Widget::initdata(){
+	resize_frame = NULL;
+	capture = NULL;
+	frame = NULL;
+	iplImg = NULL;
+	qImg = NULL;
+	timer = NULL;
 };
 WebCam_Widget::~WebCam_Widget()
 {
-	cvReleaseImage(&iplImg);
-	if (capture)cvReleaseCapture(&capture);
-	delete qImg;
-	delete timer;
+	if (iplImg)iplImg->imageData = NULL;
+	if (qImg)delete qImg; qImg = NULL;
+	if (timer)delete timer; timer = NULL;
+	if (frame)frame=NULL;
+	if (iplImg)cvReleaseImageHeader(&iplImg); iplImg = NULL;
+	if (resize_frame)cvReleaseImage(&resize_frame); resize_frame = NULL;
+	if (capture)cvReleaseCapture(&capture); capture = NULL;
 }
 void WebCam_Widget::paintEvent(QPaintEvent *e)
 {
 	QPainter painter(this);
-	if (status == W_STATUS_PLAYING || status == W_STATUS_STOP)painter.drawImage(QPoint(0, 0), *qImg);
+	if (status == STATUS_PLAYING)painter.drawImage(QPoint(0, 0), *qImg);
 }
 void WebCam_Widget::nextFrame()
 {
+	
 	frame = cvQueryFrame(capture);
 	if (frame)
 	{
+		cvResize(frame, resize_frame);
 		if (frame->origin == IPL_ORIGIN_TL)
 		{
-			cvCopy(frame, iplImg, 0);
+			cvCopy(resize_frame, iplImg, 0);
 		}
 		else
 		{
-			cvFlip(frame, iplImg, 0);
+			cvFlip(resize_frame, iplImg, 0);
 		}
 		cvCvtColor(iplImg, iplImg, CV_BGR2RGB);
 		this->update();
@@ -39,39 +56,24 @@ void WebCam_Widget::nextFrame()
 	}
 }
 void WebCam_Widget::play(){
-	if (status == W_STATUS_PLAYING)return;
-	if (status == W_STATUS_STOP){
+	if (status == STATUS_PLAYING)return;
+	if (status == STATUS_STOP){
 		timer->start();
-		status = W_STATUS_PLAYING;
+		status = STATUS_PLAYING;
 		return;
 	}
-	status = W_STATUS_PLAYING;
+	status = STATUS_PLAYING;
 	timer->start();
 };
 void WebCam_Widget::stop(){
-	if (status == W_STATUS_PLAYING){
-		status = W_STATUS_STOP;
+	if (status == STATUS_PLAYING){
+		status = STATUS_STOP;
 		timer->stop();
 	}
 };
 void WebCam_Widget::reset(){
 	timer->stop();
-	cvSetCaptureProperty(capture, CV_CAP_PROP_POS_FRAMES, 0);
-	frame = cvQueryFrame(capture);
-	if (frame)
-	{
-		if (frame->origin == IPL_ORIGIN_TL)
-		{
-			cvCopy(frame, iplImg, 0);
-		}
-		else
-		{
-			cvFlip(frame, iplImg, 0);
-		}
-		cvCvtColor(iplImg, iplImg, CV_BGR2RGB);
-		this->update();
-	}
-	status = W_STATUS_STOP;
+	status = STATUS_STOP;
 	emit sendTerminateSignal();
 };
 void WebCam_Widget::initStatus(){
@@ -80,20 +82,22 @@ void WebCam_Widget::initStatus(){
 	if (capture)
 	{
 		frame = cvQueryFrame(capture);
-		if (frame)
-			this->resize(frame->width, frame->height);
-		qImg = new QImage(QSize(frame->width, frame->height),
+		if (frame){
+			resize_frame = cvCreateImage(m_size, frame->depth, frame->nChannels);
+			cvResize(frame, resize_frame);
+		}
+		qImg = new QImage(QSize(resize_frame->width, resize_frame->height),
 			QImage::Format_RGB888);
-		iplImg = cvCreateImageHeader(cvSize(frame->width, frame->height),
+		iplImg = cvCreateImageHeader(cvSize(resize_frame->width, resize_frame->height),
 			8, 3);
 		iplImg->imageData = (char*)qImg->bits();
 		timer = new QTimer(this);
-		double fps = cvGetCaptureProperty(capture, CV_CAP_PROP_FPS);   //读取视频的帧率
+		double fps = 30;   //读取视频的帧率
 		int vfps = 1000 / fps;                                        //计算每帧播放的时间
 		timer->setInterval(vfps);
 		connect(timer, SIGNAL(timeout()), this, SLOT(nextFrame()));
 	}
-	status = W_STATUS_INIT;
+	status = STATUS_INIT;
 };
 
 

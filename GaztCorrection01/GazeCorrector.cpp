@@ -3,24 +3,30 @@
 #include <cstdlib>
 #include <Eigen/Sparse>
 #include <algorithm>
-const int TrianglesNum = 91;
-const int MaxWidth = 1024;
+#include<windows.h>
+const int TrianglesNum = 93;
+const int MaxWidth = 640;
 int lastTriangleIndex[MaxWidth];//记录当前的前w个点的triangle index.
 CvMat* all_Invet_Mat[TrianglesNum];
+CvMat* matA;
+CvMat* matY; //创建矩阵
+CvMat* matX; //创建矩阵
+
+
 int trianglesindex[TrianglesNum][3] = {
-	74, 0, 77,
-	74, 21, 0,
-	74, 22, 21,
-	74, 78, 22,
-	78, 23, 22,
-	78, 24, 23,
-	78, 18, 24,
-	78, 17, 18,
-	78, 16, 17,
-	78, 75, 16,
-	75, 15, 16,
-	75, 14, 15,
-	75, 76, 14,
+	73, 0, 76,
+	73, 21, 0,
+	73, 22, 21,
+	73, 77, 22,
+	77, 23, 22,
+	77, 24, 23,
+	77, 18, 24,
+	77, 17, 18,
+	77, 16, 17,
+	77, 74, 16,//
+	74, 15, 16,
+	74, 14, 15,
+	74, 75, 14,
 
 	21, 22, 26,
 	22, 23, 26,
@@ -34,92 +40,106 @@ int trianglesindex[TrianglesNum][3] = {
 
 	0, 21, 27,
 	21, 26, 27,
-	27, 26, 66,
-	66, 26, 28,
+	27, 26, 65,
+	65, 26, 28,
 
 	26, 25, 28,
-	28, 25, 69,
-	69, 25, 29,
+	28, 25, 68,
+	68, 25, 29,
 	25, 24, 29,
 	29, 24, 33,
 	24, 18, 33,
 	18, 19, 33,
-	19, 70, 33,
-	19, 32, 70,
+	19, 69, 33,
+	19, 32, 69,
 
 	19, 20, 32,
-	32, 20, 73,
-	20, 31, 73,
+	32, 20, 72,
+	20, 31, 72,
 	20, 15, 31,
 	15, 14, 31,
 	14, 13, 31,
 
-	27, 66, 30,
-	66, 28, 30,
-	28, 69, 30,
-	69, 29, 30,
-	33, 70, 34,
-	70, 32, 34,
-	32, 73, 34,
-	73, 31, 34,
+	27, 65, 30,
+	65, 28, 30,
+	28, 68, 30,
+	68, 29, 30,
+	33, 69, 34,
+	69, 32, 34,
+	32, 72, 34,
+	72, 31, 34,
 
 	0, 27, 1,
 	1, 27, 37,
 	27, 30, 37,
 	30, 29, 37,
-	29, 65, 37,
-	29, 33, 65,
-	33, 41, 65,
+	29, 64, 37,
+	29, 33, 64,
+	33, 41, 64,
 	33, 34, 41,
 	34, 31, 41,
 	31, 13, 41,
 	13, 12, 41,
 	1, 37, 2,
 	2, 37, 46,
-	37, 64, 46,
-	37, 65, 64,
-	65, 41, 64,
-	41, 52, 64,
+	37, 62, 46,//
+	37, 64, 62,//
+	64, 41, 62,//
+	41, 52, 62,
 	41, 12, 52,
 	2, 46, 3,
 	3, 46, 4,
 	4, 46, 5,
 	5, 46, 6,
 	6, 46, 7,
-	7, 46, 64,
-	64, 52, 7,
+	7, 46, 62,//
+	62, 52, 7,//
 	7, 52, 8,
 	8, 52, 9,
 	9, 52, 10,
 	10, 52, 11,
 	11, 52, 12,
 
-	77, 0, 2,
-	77, 2, 3,
-	77, 3, 4,
-	77, 4, 5,
-	77, 5, 6,
-	77, 6, 7,
-	77, 7, 76,
-	76, 7, 8,
-	76, 8, 9,
-	76, 9, 10,
-	76, 10, 11,
-	76, 11, 12,
-	76, 12, 14
+	76, 0, 1,//#
+	76, 1, 2,
+	
+	76, 2, 3,
+	76, 3, 4,
+	76, 4, 5,
+	76, 5, 6,
+	76, 6, 7,
+	76, 7, 75,
+	75, 7, 8,
+	75, 8, 9,
+	75, 9, 10,
+	75, 10, 11,
+	75, 11, 12,
+	75, 12, 13,
+	75,13,14
 };
 GazeCorrector::GazeCorrector()
 {
-	this->sealess_image = NULL;
-	this->transfer_image = NULL;
-	this->mid01_image = NULL;
-
+	//this->sealess_image = NULL;
+	//this->transfer_image = NULL;
+	//this->mid01_image = NULL;
+	for (int i = 0; i < TrianglesNum; i++){
+		all_Invet_Mat[i] = cvCreateMat(3, 3, CV_32FC1);//创建矩阵
+	}
+	matA = cvCreateMat(3, 3, CV_32FC1);//创建矩阵
+	matY= cvCreateMat(3, 1, CV_32FC1);
+	matX = cvCreateMat(3, 1, CV_32FC1);
 }
 GazeCorrector::~GazeCorrector()
 {
-	cvReleaseImage(&transfer_image);
-	cvReleaseImage(&sealess_image);
-	cvReleaseImage(&mid01_image);
+	//cvReleaseImage(&transfer_image);
+	//cvReleaseImage(&sealess_image);
+	//cvReleaseImage(&mid01_image);
+	cvReleaseMat(&matA);
+	for (int i = 0; i < TrianglesNum; i++){
+		cvReleaseMat(&all_Invet_Mat[i]);//创建矩阵
+	}
+	cvReleaseMat(&matX);
+	cvReleaseMat(&matY);
 }
 
 bool GazeCorrector::isInTriangle(CvPoint *a, CvPoint*b, CvPoint *c, CvPoint &p, float *landas){
@@ -138,15 +158,14 @@ bool GazeCorrector::isInTriangle(CvPoint *a, CvPoint*b, CvPoint *c, CvPoint &p, 
 		return 0;
 	}
 	CvMat* matAP = all_Invet_Mat[cur_triangeIndex];//创建矩阵
-	CvMat* matY = cvCreateMat(3, 1, CV_32FC1);//创建矩阵
 	CV_MAT_ELEM(*matY, float, 0, 0) = p.x;
 	CV_MAT_ELEM(*matY, float, 1, 0) = p.y;
 	CV_MAT_ELEM(*matY, float, 2, 0) = 1.f;
-	CvMat* matX = cvCreateMat(3, 1, CV_32FC1);//创建矩阵
 	cvMatMul(matAP, matY, matX);
 	landas[0] = CV_MAT_ELEM(*matX, float, 0, 0);
 	landas[1] = CV_MAT_ELEM(*matX, float, 1, 0);
 	landas[2] = CV_MAT_ELEM(*matX, float, 2, 0);
+	
 	return 1;
 };
 void GazeCorrector::FaceWarp(vector<CvPoint> &original_land, vector<CvPoint> &modified_land, IplImage *result){
@@ -169,7 +188,7 @@ void GazeCorrector::FaceWarp(vector<CvPoint> &original_land, vector<CvPoint> &mo
 	CvPoint original_face_center = cvPoint(0, 0), modified_face_center = cvPoint(0, 0);//use for align face transfer
 	//calculate face_left face_right face_buttom
 	face_left = width; face_right = 0; face_buttom = 0;
-	for (int i = 0; i < original_land.size(); i++){
+	for (int i = 0; i < 73; i++){
 		if (original_land[i].x < face_left)face_left = original_land[i].x;
 		if (original_land[i].x > face_right)face_right = original_land[i].x;
 		if (original_land[i].y >face_buttom)face_buttom = original_land[i].y;
@@ -183,7 +202,7 @@ void GazeCorrector::FaceWarp(vector<CvPoint> &original_land, vector<CvPoint> &mo
 		my += modified_land[i].y;
 	}
 	int ox1 = 0, oy1 = 0, mx1 = 0, my1 = 0;
-	for (int i = 46; i < 65; i++){
+	for (int i = 46; i < 64; i++){
 		ox1 += original_land[i].x;
 		oy1 += original_land[i].y;
 		mx1 += modified_land[i].x;
@@ -207,16 +226,18 @@ void GazeCorrector::FaceWarp(vector<CvPoint> &original_land, vector<CvPoint> &mo
 	 l_y = l_y ? l_y : 0;
 	 r_x = r_x >= width ? width-1 : r_x;
 	 r_y = r_y >= height ? height-1 : r_y;
-	original_land.push_back(cvPoint(l_x,l_y));
-	original_land.push_back(cvPoint(r_x,l_y));
-	original_land.push_back(cvPoint(r_x,r_y));
-	original_land.push_back(cvPoint(l_x,r_y));
-	original_land.push_back(cvPoint(m_x,l_y));
-	modified_land.push_back(cvPoint(l_x, l_y));
-	modified_land.push_back(cvPoint(r_x, l_y));
-	modified_land.push_back(cvPoint(r_x, r_y));
-	modified_land.push_back(cvPoint(l_x, r_y));
-	modified_land.push_back(cvPoint(m_x, l_y));
+
+	 original_land[73].x = l_x; original_land[73].y = l_y; 
+	 original_land[74].x = r_x; original_land[74].y = l_y;
+	 original_land[75].x = r_x; original_land[75].y = r_y;
+	 original_land[76].x = l_x; original_land[76].y = r_y;
+	 original_land[77].x = m_x; original_land[77].y = l_y;
+
+	 modified_land[73].x = l_x; modified_land[73].y = l_y;
+	 modified_land[74].x = r_x; modified_land[74].y = l_y;
+	 modified_land[75].x = r_x; modified_land[75].y = r_y;
+	 modified_land[76].x = l_x; modified_land[76].y = r_y;
+	 modified_land[77].x = m_x; modified_land[77].y = l_y;
 
 	//crete seam init path chin0-14 + 7个对称的 22个 顺时针方向 前10不用进行优化
 	vector<CvPoint> seam;
@@ -235,11 +256,9 @@ void GazeCorrector::FaceWarp(vector<CvPoint> &original_land, vector<CvPoint> &mo
 	for (int i = 0; i < MaxWidth; i++)lastTriangleIndex[i] = -1;
 	//pre calculate matrix for each triangle M-1
 	for (int i = 0; i < TrianglesNum; i++){
-		all_Invet_Mat[i] = cvCreateMat(3, 3, CV_32FC1);//创建矩阵
 		CvPoint a = modified_land[trianglesindex[i][0]];
 		CvPoint b = modified_land[trianglesindex[i][1]];
 		CvPoint c = modified_land[trianglesindex[i][2]];
-		CvMat* matA = cvCreateMat(3, 3, CV_32FC1);//创建矩阵
 		CV_MAT_ELEM(*matA, float, 0, 0) = a.x;
 		CV_MAT_ELEM(*matA, float, 0, 1) = b.x;
 		CV_MAT_ELEM(*matA, float, 0, 2) = c.x;
@@ -302,7 +321,7 @@ void GazeCorrector::FaceWarp(vector<CvPoint> &original_land, vector<CvPoint> &mo
 					map_x = 0;
 				if (map_y < 0)
 					map_y = 0;
-				//像素分界优化
+				//warp 像素分界优化
 				aa = map_x - ((int)map_x);
 				bb = map_y - ((int)map_y);
 				value00 = cvGet2D(tmpimage, (int)map_y, (int)map_x);
@@ -354,13 +373,13 @@ void GazeCorrector::FaceWarp(vector<CvPoint> &original_land, vector<CvPoint> &mo
 			}
 		}
 	}
-	cout <<"clone points: "<< counter<<endl;
-	if (this->transfer_image){
-		cvCopyImage(result, this->transfer_image);
-	}
-	else { 
-		this->transfer_image = cvCloneImage(result); 
-	}
+	//cout <<"clone points: "<< counter<<endl;
+	//if (this->transfer_image){
+	//	cvCopyImage(result, this->transfer_image);
+	//}
+	//else { 
+	//	this->transfer_image = cvCloneImage(result); 
+	//}
 
 	// creat seam path
 	vector<CvPoint> blend_seam_path2;
@@ -411,19 +430,19 @@ void GazeCorrector::FaceWarp(vector<CvPoint> &original_land, vector<CvPoint> &mo
 		cvSet2D(result, blend_y, blend_x, blend_scalar);
 	}
 	
-	cout << blend_seam_path2.size() << endl;
-	if (this->mid01_image){
-		cvCopyImage(tmpimage2, this->mid01_image);
-	}
-	else {
-		this->mid01_image = cvCloneImage(tmpimage2);
-	}
-	if (this->sealess_image){
-		cvCopyImage(result, this->sealess_image);
-	}
-	else {
-		this->sealess_image = cvCloneImage(result);
-	}
+	//cout << blend_seam_path2.size() << endl;
+	//if (this->mid01_image){
+	//	cvCopyImage(tmpimage2, this->mid01_image);
+	//}
+	//else {
+	//	this->mid01_image = cvCloneImage(tmpimage2);
+	//}
+	//if (this->sealess_image){
+	//	cvCopyImage(result, this->sealess_image);
+	//}
+	//else {
+	//	this->sealess_image = cvCloneImage(result);
+	//}
 	Finish_time = cv::getTickCount();
 	cvReleaseImage(&black2);
 	cvReleaseImage(&tmpimage);
@@ -431,7 +450,11 @@ void GazeCorrector::FaceWarp(vector<CvPoint> &original_land, vector<CvPoint> &mo
 	cvReleaseImage(&smooth_dst);
 	cvReleaseImage(&smooth_src);
 	cvReleaseImage(&polygonMap);
-	cout << "\nruntime:" << (Finish_time - Start_time)*TickFrequency << " [ms]" << std::endl;
+	delete[] polygonVertex;
+	
+	COORD p; p.X = 0; p.Y = 0;
+	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), p);
+	cout << "Current output FPS: " << 1000/((Finish_time - Start_time)*TickFrequency) <<"\t";
 	cout << "sum:" << sum << "\tnum:" << num << endl;
 	return;
 };
@@ -481,6 +504,7 @@ bool GazeCorrector::isInPolygon(vector<CvPoint> &polygon_points, CvPoint &center
 };
 float blockAvgIntensity(IplImage *image, CvPoint &point){
 	float sum = 0;
+	//TODO: here has out of range bug!
 	for (int i = point.x - 2; i < point.x + 3; i++){
 		for (int j = point.y - 2; j < point.y + 3; j++){
 			sum += cvGet2D(image, i, j).val[0];
@@ -531,7 +555,8 @@ void GazeCorrector::OptimizeSeam(IplImage *original, IplImage *modified, vector<
 			}
 		}
 	}
-
+	cvReleaseImage(&original_gray);
+	cvReleaseImage(&modified_gray);
 };
 
 void GazeCorrector::seamOptimalUsingEigen(unsigned char * imageData, int width, int height, int PixelChannels)

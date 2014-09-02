@@ -1,23 +1,60 @@
 #include  "videoWidget.h"
 #include <QtGui\QPainter> 
 #include <QtCore\QPoint> 
-VideoWidget::VideoWidget(const char *filename, QWidget *parent /* = 0 */) : QWidget(parent)
+void VideoWidget::initdata(){
+	resize_frame = NULL;
+	capture = NULL;
+	frame = NULL;
+	iplImg = NULL;
+	qImg = NULL;
+	timer = NULL;
+};
+VideoWidget::VideoWidget(const char *filename)
 {
+	this->initdata();
 	filepath.clear();
 	filepath.append(filename);
 	this->initStatus();
 	this->reset();
+	
 }
-VideoWidget::VideoWidget(QWidget *parent /* = 0 */) : QWidget(parent){
+VideoWidget::VideoWidget(const char *filename, CvSize size){
+	this->initdata();
+	m_size = size;
+	this->setFixedHeight(size.height);
+	this->setFixedWidth(size.width);
+	this->resize(m_size.width, m_size.height);
+	filepath.clear();
+	filepath.append(filename);
+	this->initStatus();
+	this->reset();
+	
+};
+
+VideoWidget::VideoWidget(QWidget *parent /* = 0 */){
 	firstSet = true;
 	status = STATUS_PLAYING;
+	this->initdata();
+	
+};
+VideoWidget::VideoWidget(CvSize size){
+	this->initdata();
+	m_size = size;
+	this->setFixedHeight(size.height);
+	this->setFixedWidth(size.width);
+	this->resize(m_size.width, m_size.height);
+	firstSet = true;
+	status = STATUS_PLAYING;
+
 };
 VideoWidget::~VideoWidget()
 {
-	cvReleaseImage(&iplImg);
-	if (capture)cvReleaseCapture(&capture);
-	delete qImg;
-	delete timer;
+	if(qImg)delete qImg; qImg = NULL;
+	if(timer)delete timer; timer = NULL;
+	if (frame) frame = NULL;
+	if (iplImg)cvReleaseImageHeader(&iplImg); iplImg = NULL;
+	if (resize_frame)cvReleaseImage(&resize_frame); resize_frame = NULL;
+	if (capture)cvReleaseCapture(&capture); capture = NULL;
 }
 void VideoWidget::paintEvent(QPaintEvent *e)
 {
@@ -29,13 +66,15 @@ void VideoWidget::nextFrame()
 	frame = cvQueryFrame(capture);
 	if (frame)
 	{
+		cvResize(frame, resize_frame);
+
 		if (frame->origin == IPL_ORIGIN_TL)
 		{
-			cvCopy(frame, iplImg, 0);
+			cvCopy(resize_frame, iplImg, 0);
 		}
 		else
 		{
-			cvFlip(frame, iplImg, 0);
+			cvFlip(resize_frame, iplImg, 0);
 		}
 		cvCvtColor(iplImg, iplImg, CV_BGR2RGB);
 		this->update();
@@ -66,13 +105,15 @@ void VideoWidget::reset(){
 	frame = cvQueryFrame(capture);
 	if (frame)
 	{
+		cvResize(frame, resize_frame);
+
 		if (frame->origin == IPL_ORIGIN_TL)
 		{
-			cvCopy(frame, iplImg, 0);
+			cvCopy(resize_frame, iplImg, 0);
 		}
 		else
 		{
-			cvFlip(frame, iplImg, 0);
+			cvFlip(resize_frame, iplImg, 0);
 		}
 		cvCvtColor(iplImg, iplImg, CV_BGR2RGB);
 		this->update();
@@ -85,11 +126,13 @@ void VideoWidget::initStatus(){
 	if (capture)
 	{
 		frame = cvQueryFrame(capture);
-		if (frame)
-			this->resize(frame->width, frame->height);
-		qImg = new QImage(QSize(frame->width, frame->height),
+		if (frame){
+			resize_frame = cvCreateImage(m_size, frame->depth, frame->nChannels);
+			cvResize(frame, resize_frame);
+		}
+		qImg = new QImage(QSize(m_size.width, m_size.height),
 			QImage::Format_RGB888);
-		iplImg = cvCreateImageHeader(cvSize(frame->width, frame->height),
+		iplImg = cvCreateImageHeader(cvSize(m_size.width, m_size.height),
 			8, 3);
 		iplImg->imageData = (char*)qImg->bits();
 		timer = new QTimer(this);

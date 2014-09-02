@@ -101,6 +101,15 @@
     <ClCompile Include="GeneratedFiles\Release\moc_webcam_widget.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_VideoWidget_Base.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_VideoWidget_Base.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="VideoWidget_Base.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="gaztcorrection.h">
@@ -119,6 +128,9 @@
       <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="webcam_widget.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="VideoWidget_Base.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>

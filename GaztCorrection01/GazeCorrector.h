@@ -2,6 +2,7 @@
 #include <opencv/cv.h>
 #include<opencv/highgui.h>
 #include<ctime>
+
 using namespace std;
 
 class GazeCorrector
@@ -14,9 +15,9 @@ public:
 	//interface
 	void FaceWarp(vector<CvPoint> &original_land, vector<CvPoint> &modified_land, IplImage *original);
 	//mid data
-	IplImage *transfer_image;//for debug
-	IplImage *mid01_image;//for debug
-	IplImage *sealess_image;//for debug
+	//IplImage *transfer_image;//for debug
+	//IplImage *mid01_image;//for debug
+	//IplImage *sealess_image;//for debug
 private:
 	void OptimizeSeam(IplImage *original, IplImage *modified, vector<CvPoint> &seam, CvPoint &center, CvPoint &left_upper, CvPoint &right_buttom);
 	void seamOptimalUsingEigen(unsigned char * imageData, int width, int height, int PixelChannels);

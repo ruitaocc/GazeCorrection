@@ -51,6 +51,10 @@ public:
     QRadioButton *m_radioBtn_Realtime;
     QRadioButton *m_radioBtn_offline;
     QPushButton *m_file_btn;
+    QPushButton *m_dde_init_btn;
+    QPushButton *m_dde_first_track_btn;
+    QPushButton *m_dde_track_brn;
+    QPushButton *m_calibration_btn;
     QMenuBar *menuBar;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
@@ -59,12 +63,12 @@ public:
     {
         if (GaztCorrectionClass->objectName().isEmpty())
             GaztCorrectionClass->setObjectName(QStringLiteral("GaztCorrectionClass"));
-        GaztCorrectionClass->resize(932, 904);
+        GaztCorrectionClass->resize(1327, 904);
         centralWidget = new QWidget(GaztCorrectionClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         tabWidget = new QTabWidget(centralWidget);
         tabWidget->setObjectName(QStringLiteral("tabWidget"));
-        tabWidget->setGeometry(QRect(0, 390, 661, 461));
+        tabWidget->setGeometry(QRect(90, 540, 451, 311));
         in = new QWidget();
         in->setObjectName(QStringLiteral("in"));
         m_Image = new QLabel(in);
@@ -97,13 +101,13 @@ public:
         tabWidget->addTab(tab_2, QString());
         m_groupBox = new QGroupBox(centralWidget);
         m_groupBox->setObjectName(QStringLiteral("m_groupBox"));
-        m_groupBox->setGeometry(QRect(0, 0, 331, 261));
+        m_groupBox->setGeometry(QRect(0, 0, 661, 501));
         m_out_groupBox = new QGroupBox(centralWidget);
         m_out_groupBox->setObjectName(QStringLiteral("m_out_groupBox"));
-        m_out_groupBox->setGeometry(QRect(330, 0, 331, 261));
+        m_out_groupBox->setGeometry(QRect(660, 0, 661, 501));
         groupBox_2 = new QGroupBox(centralWidget);
         groupBox_2->setObjectName(QStringLiteral("groupBox_2"));
-        groupBox_2->setGeometry(QRect(0, 270, 661, 80));
+        groupBox_2->setGeometry(QRect(590, 540, 661, 80));
         m_reset_btn = new QPushButton(groupBox_2);
         m_reset_btn->setObjectName(QStringLiteral("m_reset_btn"));
         m_reset_btn->setGeometry(QRect(290, 40, 75, 23));
@@ -121,11 +125,23 @@ public:
         m_radioBtn_offline->setGeometry(QRect(10, 40, 89, 16));
         m_file_btn = new QPushButton(groupBox_2);
         m_file_btn->setObjectName(QStringLiteral("m_file_btn"));
-        m_file_btn->setGeometry(QRect(400, 40, 75, 23));
+        m_file_btn->setGeometry(QRect(370, 40, 75, 23));
+        m_dde_init_btn = new QPushButton(groupBox_2);
+        m_dde_init_btn->setObjectName(QStringLiteral("m_dde_init_btn"));
+        m_dde_init_btn->setGeometry(QRect(130, 10, 75, 23));
+        m_dde_first_track_btn = new QPushButton(groupBox_2);
+        m_dde_first_track_btn->setObjectName(QStringLiteral("m_dde_first_track_btn"));
+        m_dde_first_track_btn->setGeometry(QRect(210, 10, 101, 23));
+        m_dde_track_brn = new QPushButton(groupBox_2);
+        m_dde_track_brn->setObjectName(QStringLiteral("m_dde_track_brn"));
+        m_dde_track_brn->setGeometry(QRect(320, 10, 75, 23));
+        m_calibration_btn = new QPushButton(groupBox_2);
+        m_calibration_btn->setObjectName(QStringLiteral("m_calibration_btn"));
+        m_calibration_btn->setGeometry(QRect(530, 10, 121, 61));
         GaztCorrectionClass->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(GaztCorrectionClass);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 932, 23));
+        menuBar->setGeometry(QRect(0, 0, 1327, 23));
         GaztCorrectionClass->setMenuBar(menuBar);
         mainToolBar = new QToolBar(GaztCorrectionClass);
         mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
@@ -141,6 +157,10 @@ public:
         QObject::connect(m_file_btn, SIGNAL(clicked()), GaztCorrectionClass, SLOT(file()));
         QObject::connect(m_radioBtn_Realtime, SIGNAL(clicked()), GaztCorrectionClass, SLOT(processMode()));
         QObject::connect(m_radioBtn_offline, SIGNAL(clicked()), GaztCorrectionClass, SLOT(processMode()));
+        QObject::connect(m_dde_init_btn, SIGNAL(clicked()), GaztCorrectionClass, SLOT(dde_init()));
+        QObject::connect(m_dde_first_track_btn, SIGNAL(clicked()), GaztCorrectionClass, SLOT(dde_first_track()));
+        QObject::connect(m_dde_track_brn, SIGNAL(clicked()), GaztCorrectionClass, SLOT(dde_track()));
+        QObject::connect(m_calibration_btn, SIGNAL(clicked()), GaztCorrectionClass, SLOT(calibration()));
 
         tabWidget->setCurrentIndex(1);
 
@@ -170,6 +190,10 @@ public:
         m_radioBtn_Realtime->setText(QApplication::translate("GaztCorrectionClass", "RealTime", 0));
         m_radioBtn_offline->setText(QApplication::translate("GaztCorrectionClass", "Off Line", 0));
         m_file_btn->setText(QApplication::translate("GaztCorrectionClass", "File", 0));
+        m_dde_init_btn->setText(QApplication::translate("GaztCorrectionClass", "DDE init", 0));
+        m_dde_first_track_btn->setText(QApplication::translate("GaztCorrectionClass", "DDE track", 0));
+        m_dde_track_brn->setText(QApplication::translate("GaztCorrectionClass", "DDE track", 0));
+        m_calibration_btn->setText(QApplication::translate("GaztCorrectionClass", "Calibration", 0));
     } // retranslateUi
 
 };

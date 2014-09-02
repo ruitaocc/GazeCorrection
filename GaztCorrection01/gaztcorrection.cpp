@@ -16,6 +16,8 @@
 #include "videoWidget.h"
 using namespace std;
 
+#define vWidth 640
+#define vHeight 480
 const int linesNum = 76;
 string imagepath("C:/Users/VectorCai/Desktop/gazetest/02.png");
 string default_vediopath("C:/Users/VectorCai/Desktop/gazetest/test.avi");
@@ -126,16 +128,16 @@ GaztCorrection::GaztCorrection(QWidget *parent)
 	: QMainWindow(parent)
 {
 	ui.setupUi(this);
-
 	m_video_filepath = default_vediopath;
 	m_mode = P_OFFLINE_MODE;
+	;
 	loop = false;
 	this->ui.m_radioBtn_offline->setChecked(1);
 
 	QImage imagein(imagepath.c_str());
 	QImage image_target_out(target_out_imagepath.c_str());
 	IplImage *t_test = cvLoadImage(imagepath.c_str());
-	this->resize(1200, 800);
+	this->resize(1400, 800);
 	this->ui.m_Image->setPixmap(QPixmap::fromImage(imagein));
 	this->ui.m_target_out_image->setPixmap(QPixmap::fromImage(image_target_out));
 	
@@ -147,31 +149,34 @@ GaztCorrection::GaztCorrection(QWidget *parent)
 	this->paintLands();
 	//add player
 	QGridLayout * in_group_Layout = new QGridLayout();
-	m_video_local_input_widget = new VideoWidget(m_video_filepath.c_str());
-	m_video_local_input_widget->setFixedHeight(240);
-	m_video_local_input_widget->setFixedWidth(320);
+	//add local video
+	m_video_local_input_widget = new VideoWidget(m_video_filepath.c_str(), cvSize(vWidth, vHeight));
 	in_group_Layout->addWidget(m_video_local_input_widget, 0, 0, Qt::AlignLeft | Qt::AlignTop);
-	this->ui.m_groupBox->setLayout(in_group_Layout);
 	m_video_local_input_widget->show();
 	connect(m_video_local_input_widget, SIGNAL(sendTerminateSignal()), this, SLOT(receiveTerminateSignal()));
-
+	//add real time
+	m_video_webcam_input_widget = new WebCam_Widget(cvSize(vWidth, vHeight));
+	
+	in_group_Layout->addWidget(m_video_webcam_input_widget, 0, 0, Qt::AlignLeft | Qt::AlignTop);
+	m_video_webcam_input_widget->hide();
+	this->ui.m_groupBox->setLayout(in_group_Layout);
+	
+	//add output frame
 	QGridLayout * out_group_Layout = new QGridLayout();
-	m_video_output_widget = new VideoWidget();
-	m_video_output_widget->setFixedWidth(320);
-	m_video_output_widget->setFixedHeight(240);
+	m_video_output_widget = new VideoWidget(cvSize(vWidth, vHeight));
 	m_video_output_widget->setNextFrame(m_video_local_input_widget->getCurrentFrameClone());
 	out_group_Layout->addWidget(m_video_output_widget, 0, 0, Qt::AlignLeft | Qt::AlignTop);
 	this->ui.m_out_groupBox->setLayout(out_group_Layout);
 	m_video_output_widget->show();
-	m_gaze_conthroller->setInputAndOutput(m_video_local_input_widget, m_video_output_widget);
+	
 
-	m_video_webcam_input_widget = new WebCam_Widget();
 }
 
 GaztCorrection::~GaztCorrection()
 {
 	delete m_video_local_input_widget;
 	delete m_video_output_widget;
+	delete m_video_webcam_input_widget;
 }
 
 void GaztCorrection::setNextFrameToOutput(IplImage *img){
@@ -179,13 +184,28 @@ void GaztCorrection::setNextFrameToOutput(IplImage *img){
 	if (loop)m_gaze_conthroller->start();
 };
 void GaztCorrection::playVideo(){
-	m_video_local_input_widget->play();
-	loop = true;
-	m_gaze_conthroller->start();
+	if (m_mode == P_OFFLINE_MODE){
+		m_gaze_conthroller->setInputAndOutput(m_video_local_input_widget, m_video_output_widget);
+		m_video_local_input_widget->play();
+		loop = true;
+		m_gaze_conthroller->start();
+	}
+	if (m_mode == P_REALTIME_MODE){
+		m_gaze_conthroller->setInputAndOutput(m_video_webcam_input_widget, m_video_output_widget);
+		m_video_webcam_input_widget->play();
+		loop = true;
+		m_gaze_conthroller->start();
+	}
 };
 void GaztCorrection::stopVideo(){
-	m_video_local_input_widget->stop();
-	loop = false;
+	if (m_mode == P_OFFLINE_MODE){
+		m_video_local_input_widget->stop();
+		loop = false;
+	}
+	if (m_mode == P_REALTIME_MODE){
+		m_video_webcam_input_widget->stop();
+		loop = false;
+	}
 };
 void GaztCorrection::terminateVideo(){
 	m_video_local_input_widget->reset();
@@ -203,8 +223,8 @@ void GaztCorrection::paintLands(){
 	string land_modified_file_path("C:/Users/VectorCai/Desktop/gazetest/03.land");
 	
 	QImage image(imagepath.c_str());
-	int s_width = image.width();
-	int s_height = image.height();
+	int s_width = 640;
+	int s_height = 480;
 	int size = 0;
 	fstream file(land_original_file_path.c_str());
 	file >> size;
@@ -225,12 +245,12 @@ void GaztCorrection::paintLands(){
 	file.close();
 	//m_gaze_conthroller->setData(original_land, modified_land);
 	emit sendData(original_land, modified_land);
-	IplImage *inputImage = cvLoadImage(imagepath.c_str());
-	GazeCorrector *gazecorrector = new GazeCorrector();
-	gazecorrector->FaceWarp(original_land, modified_land, inputImage);
-	this->ui.m_transfer_iamge->setPixmap(QPixmap::fromImage(*IplImageToQImage(gazecorrector->transfer_image)));
-	this->ui.m_output_image->setPixmap(QPixmap::fromImage(*IplImageToQImage(gazecorrector->mid01_image)));
-	this->ui.m_seamless_image->setPixmap(QPixmap::fromImage(*IplImageToQImage(gazecorrector->sealess_image)));
+	//IplImage *inputImage = cvLoadImage(imagepath.c_str());
+	//GazeCorrector *gazecorrector = new GazeCorrector();
+	//gazecorrector->FaceWarp(original_land, modified_land, inputImage);
+	//this->ui.m_transfer_iamge->setPixmap(QPixmap::fromImage(*IplImageToQImage(gazecorrector->transfer_image)));
+	//this->ui.m_output_image->setPixmap(QPixmap::fromImage(*IplImageToQImage(gazecorrector->mid01_image)));
+	//this->ui.m_seamless_image->setPixmap(QPixmap::fromImage(*IplImageToQImage(gazecorrector->sealess_image)));
 }; 
 
 void GaztCorrection::file(){
@@ -242,28 +262,49 @@ void GaztCorrection::file(){
 	}
 };
 void GaztCorrection::processMode(){
+	this->stopVideo();// stop the current input
 	if (this->ui.m_radioBtn_Realtime->isChecked()){
 		m_mode = P_REALTIME_MODE;
+		m_video_local_input_widget->hide();
+		m_video_webcam_input_widget->show();
 		this->hideControlBtns();
+		this->showRealTime(true);
 	}
 	else {
 		m_mode = P_OFFLINE_MODE;
+		m_video_local_input_widget->show();
+		m_video_webcam_input_widget->hide();
 		this->showControlBtns();
+		this->showRealTime(false);
 	}
 };
+void GaztCorrection::showRealTime(bool isRealTime){
+
+}
 void GaztCorrection::hideControlBtns(){
 	this->ui.m_file_btn->hide();
 	this->ui.m_reset_btn->hide();
-	this->ui.m_stop_btn->hide();
-	this->ui.m_play_btn->hide();
+	//this->ui.m_stop_btn->hide();
+	//this->ui.m_play_btn->hide();
 };
 void GaztCorrection::showControlBtns(){
 	this->ui.m_file_btn->show();
 	this->ui.m_reset_btn->show();
-	this->ui.m_stop_btn->show();
-	this->ui.m_play_btn->show();
+	//this->ui.m_stop_btn->show();
+	//this->ui.m_play_btn->show();
 };
-
+void GaztCorrection::dde_init(){
+	this->m_gaze_conthroller->dde_init();
+};
+void GaztCorrection::dde_first_track(){
+	this->m_gaze_conthroller->dde_first_track();
+};
+void GaztCorrection::dde_track(){
+	this->m_gaze_conthroller->dde_init();
+};
+void GaztCorrection::calibration(){
+	this->m_gaze_conthroller->calibration();
+};
 /*
 void GaztCorrection::pait(){
 	//paint lands

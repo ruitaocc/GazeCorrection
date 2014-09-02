@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>932</width>
+    <width>1327</width>
     <height>904</height>
    </rect>
   </property>
@@ -17,10 +17,10 @@
    <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
      <rect>
-      <x>0</x>
-      <y>390</y>
-      <width>661</width>
-      <height>461</height>
+      <x>90</x>
+      <y>540</y>
+      <width>451</width>
+      <height>311</height>
      </rect>
     </property>
     <property name="currentIndex">
@@ -122,8 +122,8 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>331</width>
-      <height>261</height>
+      <width>661</width>
+      <height>501</height>
      </rect>
     </property>
     <property name="title">
@@ -133,10 +133,10 @@
    <widget class="QGroupBox" name="m_out_groupBox">
     <property name="geometry">
      <rect>
-      <x>330</x>
+      <x>660</x>
       <y>0</y>
-      <width>331</width>
-      <height>261</height>
+      <width>661</width>
+      <height>501</height>
      </rect>
     </property>
     <property name="title">
@@ -146,8 +146,8 @@
    <widget class="QGroupBox" name="groupBox_2">
     <property name="geometry">
      <rect>
-      <x>0</x>
-      <y>270</y>
+      <x>590</x>
+      <y>540</y>
       <width>661</width>
       <height>80</height>
      </rect>
@@ -223,7 +223,7 @@
     <widget class="QPushButton" name="m_file_btn">
      <property name="geometry">
       <rect>
-       <x>400</x>
+       <x>370</x>
        <y>40</y>
        <width>75</width>
        <height>23</height>
@@ -233,6 +233,58 @@
       <string>File</string>
      </property>
     </widget>
+    <widget class="QPushButton" name="m_dde_init_btn">
+     <property name="geometry">
+      <rect>
+       <x>130</x>
+       <y>10</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>DDE init</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="m_dde_first_track_btn">
+     <property name="geometry">
+      <rect>
+       <x>210</x>
+       <y>10</y>
+       <width>101</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>DDE track</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="m_dde_track_brn">
+     <property name="geometry">
+      <rect>
+       <x>320</x>
+       <y>10</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>DDE track</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="m_calibration_btn">
+     <property name="geometry">
+      <rect>
+       <x>530</x>
+       <y>10</y>
+       <width>121</width>
+       <height>61</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Calibration</string>
+     </property>
+    </widget>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -240,7 +292,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>932</width>
+     <width>1327</width>
      <height>23</height>
     </rect>
    </property>
@@ -267,8 +319,8 @@
    <slot>playVideo()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>204</x>
-     <y>345</y>
+     <x>770</x>
+     <y>625</y>
     </hint>
     <hint type="destinationlabel">
      <x>830</x>
@@ -283,8 +335,8 @@
    <slot>stopVideo()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>284</x>
-     <y>345</y>
+     <x>850</x>
+     <y>625</y>
     </hint>
     <hint type="destinationlabel">
      <x>793</x>
@@ -299,8 +351,8 @@
    <slot>terminateVideo()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>364</x>
-     <y>345</y>
+     <x>930</x>
+     <y>625</y>
     </hint>
     <hint type="destinationlabel">
      <x>787</x>
@@ -315,8 +367,8 @@
    <slot>file()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>439</x>
-     <y>357</y>
+     <x>960</x>
+     <y>637</y>
     </hint>
     <hint type="destinationlabel">
      <x>806</x>
@@ -331,8 +383,8 @@
    <slot>processMode()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>56</x>
-     <y>336</y>
+     <x>650</x>
+     <y>605</y>
     </hint>
     <hint type="destinationlabel">
      <x>792</x>
@@ -347,12 +399,76 @@
    <slot>processMode()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>32</x>
-     <y>356</y>
+     <x>650</x>
+     <y>625</y>
     </hint>
     <hint type="destinationlabel">
      <x>754</x>
      <y>416</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>m_dde_init_btn</sender>
+   <signal>clicked()</signal>
+   <receiver>GaztCorrectionClass</receiver>
+   <slot>dde_init()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>770</x>
+     <y>595</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>762</x>
+     <y>492</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>m_dde_first_track_btn</sender>
+   <signal>clicked()</signal>
+   <receiver>GaztCorrectionClass</receiver>
+   <slot>dde_first_track()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>850</x>
+     <y>595</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>767</x>
+     <y>576</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>m_dde_track_brn</sender>
+   <signal>clicked()</signal>
+   <receiver>GaztCorrectionClass</receiver>
+   <slot>dde_track()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>960</x>
+     <y>595</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>752</x>
+     <y>630</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>m_calibration_btn</sender>
+   <signal>clicked()</signal>
+   <receiver>GaztCorrectionClass</receiver>
+   <slot>calibration()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1163</x>
+     <y>616</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1110</x>
+     <y>732</y>
     </hint>
    </hints>
   </connection>
@@ -363,5 +479,9 @@
   <slot>terminateVideo()</slot>
   <slot>file()</slot>
   <slot>processMode()</slot>
+  <slot>dde_init()</slot>
+  <slot>dde_first_track()</slot>
+  <slot>dde_track()</slot>
+  <slot>calibration()</slot>
  </slots>
 </ui>
